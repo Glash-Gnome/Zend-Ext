@@ -1,6 +1,7 @@
 {
     "name": "Glash-Gnome/zend-ext",
     "description": "provides tools for working with PHP extension",
+    "version": "0.1.0",
     "type": "library",
     "require": {
         "php": ">=7.2.6",
