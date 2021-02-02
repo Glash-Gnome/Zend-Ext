@@ -25,6 +25,10 @@ abstract class AbstractGenerator implements GeneratorInterface
      */
     const LINE_FEED = "\n";
 
+    const VISIBILITY_PRIVATE = 0;
+    const VISIBILITY_PROTECTED = 1;
+    const VISIBILITY_PUBLIC = 2;
+
     /**
      * @var int|string 4 spaces by default
      */
@@ -38,6 +42,13 @@ abstract class AbstractGenerator implements GeneratorInterface
      * AbstractGenerator
      */
     protected $parentGenerator;
+
+    /**
+     * integer
+     */
+    protected $visibility=self::VISIBILITY_PUBLIC;
+
+
     /*
      *
      */
@@ -82,7 +93,7 @@ abstract class AbstractGenerator implements GeneratorInterface
     }
 
     /**
-     * @return string
+     * @return AbstractGenerator
      */
     public function getParentGenerator()
     {
@@ -113,4 +124,37 @@ abstract class AbstractGenerator implements GeneratorInterface
 
         return $this;
     }
+
+    /**
+     * @return int
+     */
+    public function getVisibility()
+    {
+        return $this->visibility;
+    }
+
+    /**
+     * @param int $visibility
+     */
+    public function setVisibility($visibility): void
+    {
+        $this->visibility = $visibility;
+    }
+
+    public function generate($scope)
+    {
+        switch ($scope) {
+            case 'arginfo':
+                return $this->generate_arginfo();
+                break;
+            case 'header':
+                return $this->generateHeader();
+                break;
+            case 'source':
+            default:
+                return $this->generateSource();
+                break;
+        }
+    }
+
 }

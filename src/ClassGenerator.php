@@ -149,8 +149,9 @@ class ClassGenerator extends AbstractGenerator //implements TraitUsageInterface
     public function setName($name)
     {
         if (strstr($name, '\\')) {
-            $namespace = substr($name, 0, strrpos($name, '\\'));
-            $name      = substr($name, strrpos($name, '\\') + 1);
+            $pos = strrpos($name, '\\');
+            $namespace = substr($name, 0, $pos);
+            $name      = substr($name, $pos + 1);
             $this->setNamespaceName($namespace);
         }
 
@@ -172,7 +173,7 @@ class ClassGenerator extends AbstractGenerator //implements TraitUsageInterface
      */
     public function setNamespaceName($namespaceName)
     {
-        $this->namespaceName = $namespaceName;
+        $this->namespaceName = str_replace('\\', '_', $namespaceName);
         return $this;
     }
 
@@ -737,6 +738,7 @@ class ClassGenerator extends AbstractGenerator //implements TraitUsageInterface
             ));
         }
 
+        $method->setParentGenerator($this);
         $this->methods[strtolower($methodName)] = $method;
         return $this;
     }
@@ -865,10 +867,20 @@ class ClassGenerator extends AbstractGenerator //implements TraitUsageInterface
     }
 
 
+    public function generate_me()
+    {
+        $output = '';
+        $methods = $this->getMethods();
+
+        foreach ($methods as $method) {
+            $output .= $method->generate_PHP_METHOD() . self::LINE_FEED;
+        }
+
+        return $output;
+    }
     public function generateSource()
     {
         // generate docBlockLicence
-
         $naming = new Naming\GnomeStrategy();
 
         $output = '';
@@ -967,88 +979,37 @@ class ClassGenerator extends AbstractGenerator //implements TraitUsageInterface
 
         return $output;
     }
-    public function generate($scope)
-    {
-        switch ($scope) {
-            case 'header':
-                return $this->generateHeader();
-                break;
-            case 'source':
-            default:
-                return $this->generateSource();
-                break;
-        }
-    }
 
 
     /**
      * @inheritDoc
      */
-    public function generateXXX()
+    public function generate_arginfo()
     {
-        $indent = $this->getIndentation();
+        $camelCaseToUnderscore = new \Zend\Filter\Word\CamelCaseToUnderscore();
+        $stringToLower = new \Zend\Filter\StringToLower();
+
+        $tab = $this->getIndentation();
         $output = '';
 
-        if (null !== ($namespace = $this->getNamespaceName())) {
-            $output .= 'namespace ' . $namespace . ';' . self::LINE_FEED . self::LINE_FEED;
+        $object_ns = $stringToLower->filter($camelCaseToUnderscore->filter($this->getNamespaceName()));
+        $object_name = $stringToLower->filter($camelCaseToUnderscore->filter($this->getName()));
+        $name = $object_name;
+        if (!empty($object_ns)) {
+            $name = $object_ns.'_'.$object_name;
         }
 
-        $uses = $this->getUses();
-
-        if (! empty($uses)) {
-            foreach ($uses as $use) {
-                $output .= 'use ' . $use . ';' . self::LINE_FEED;
-            }
-
-            $output .= self::LINE_FEED;
+        foreach ($this->getMethods() as $method) {
+            $output .= $method->generate_arginfo() . self::LINE_FEED;
         }
 
-        if (null !== ($docBlock = $this->getDocBlock())) {
-            $docBlock->setIndentation('');
-            $output .= $docBlock->generate();
+
+        $output .= 'static const zend_function_entry '.$name.'_functions[] = {' . self::LINE_FEED;
+        foreach ($this->getMethods() as $method) {
+            $output .= $tab . $method->generate_me() . self::LINE_FEED;
         }
-
-        if ($this->isAbstract()) {
-            $output .= 'abstract ';
-        } elseif ($this->isFinal()) {
-            $output .= 'final ';
-        }
-
-        //$output .= static::OBJECT_TYPE . ' ' . $this->getName();
-
-        if (! empty($this->extendedClass)) {
-            $output .= ' extends ' . $this->generateShortOrCompleteClassname($this->extendedClass);
-        }
-
-        $implemented = $this->getImplementedInterfaces();
-
-        if (! empty($implemented)) {
-            $implemented = array_map([$this, 'generateShortOrCompleteClassname'], $implemented);
-            $output .= ' ' . static::IMPLEMENTS_KEYWORD . ' ' . implode(', ', $implemented);
-        }
-
-        $output .= self::LINE_FEED . '{' . self::LINE_FEED . self::LINE_FEED;
-        //$output .= $this->traitUsageGenerator->generate();
-
-        $constants = $this->getConstants();
-
-        foreach ($constants as $constant) {
-            $output .= $constant->generate() . self::LINE_FEED . self::LINE_FEED;
-        }
-
-        $properties = $this->getProperties();
-
-        foreach ($properties as $property) {
-            $output .= $property->generate() . self::LINE_FEED . self::LINE_FEED;
-        }
-
-        $methods = $this->getMethods();
-
-        foreach ($methods as $method) {
-            $output .= $method->generate() . self::LINE_FEED;
-        }
-
-        $output .= self::LINE_FEED . '}' . self::LINE_FEED;
+        $output .= $tab . 'PHP_FE_END' . self::LINE_FEED;
+        $output .= '};' . self::LINE_FEED;
 
         return $output;
     }
