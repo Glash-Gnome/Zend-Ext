@@ -38,6 +38,14 @@ abstract class AbstractGenerator implements GeneratorInterface
     protected $author = 'Glash';
     protected $email = '5312910@php.net';
 
+    protected $description = '';
+    protected $short_description = '';
+
+    /**
+     * @var Zend\Ext\Adapter $adapter
+     */
+    protected $adapter;
+
     /**
      * AbstractGenerator
      */
@@ -140,11 +148,67 @@ abstract class AbstractGenerator implements GeneratorInterface
     {
         $this->visibility = $visibility;
     }
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     * @return AbstractGenerator
+     */
+    public function setDescription(string $description): AbstractGenerator
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getShortDescription(): string
+    {
+        return $this->short_description;
+    }
+
+    /**
+     * @param string $short_description
+     * @return AbstractGenerator
+     */
+    public function setShortDescription(string $short_description): AbstractGenerator
+    {
+        $this->short_description = $short_description;
+        return $this;
+    }
+
+    /**
+     * @return Zend\Ext\Adapter
+     */
+    public function getAdapter()
+    {
+        return $this->adapter;
+    }
+
+    /**
+     * @param Zend\Ext\Adapter $adapter
+     * @return AbstractGenerator
+     */
+    public function setAdapter($adapter)
+    {
+        $this->adapter = $adapter;
+        return $this;
+    }
 
     public function generate($scope)
     {
+        //$this->getAdapter()->setScope($scope);
+        return $this->getAdapter()->generate($this);
+        /*
         switch ($scope) {
-            case 'arginfo':
+            case 'include':
                 return $this->generate_arginfo();
                 break;
             case 'header':
@@ -155,6 +219,6 @@ abstract class AbstractGenerator implements GeneratorInterface
                 return $this->generateSource();
                 break;
         }
+        */
     }
-
 }

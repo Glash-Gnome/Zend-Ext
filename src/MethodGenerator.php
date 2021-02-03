@@ -517,6 +517,8 @@ ZEND_END_ARG_INFO()
      */
     public function generate($scope)
     {
+        return parent::generate($scope);
+
         switch ($scope) {
             case 'header':
                 return $this->generateHeader();
