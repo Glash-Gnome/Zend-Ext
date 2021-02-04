@@ -2,9 +2,9 @@
 C & Php code generator from ModelGenerator
 
 TODO:
-rename ClassGenerator by ClassReflexion|ClassModel
-Or
-rename Php\ClassGenerator by Php\ClassAdapter
+
+FIXME Php\ClassGenerator ~ Php\ClassAdapter
+rename Models\ClassGenerator by Models\ClassModel
 
 ```
 Models
@@ -12,6 +12,8 @@ Models
   MethodModel
 Views
   C
+    function.phtml
+    method.phtml
   Php
     Poo
       function.phtml

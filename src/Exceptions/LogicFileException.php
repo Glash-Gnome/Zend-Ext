@@ -7,9 +7,11 @@
  * @license   GPL 3.0
  */
 
-namespace Zend\Ext\Models;
+namespace Zend\Ext\Exceptions;
 
-interface GeneratorInterface
-{
-    public function generate($scope);
-}
+use Error;
+
+/**
+ * Invalid File Exception
+ */
+class LogicFileException extends Error{}

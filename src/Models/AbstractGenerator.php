@@ -7,7 +7,7 @@
  * @license   GPL 3.0
  */
 
-namespace Zend\Ext;
+namespace Zend\Ext\Models;
 
 use Traversable;
 

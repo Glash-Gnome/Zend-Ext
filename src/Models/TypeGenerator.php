@@ -8,9 +8,9 @@
  */
 
 
-namespace Zend\Ext;
+namespace Zend\Ext\Models;
 
-use Zend\Ext\AbstractGenerator;
+use Zend\Ext\Models\AbstractGenerator;
 
 
 class TypeGenerator extends AbstractGenerator

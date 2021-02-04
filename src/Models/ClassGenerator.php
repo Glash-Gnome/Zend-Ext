@@ -7,10 +7,10 @@
  * @license   GPL 3.0
  */
 
-namespace Zend\Ext;
+namespace Zend\Ext\Models;
 
 //use Zend\Code\Reflection\ClassReflection;
-use Zend\Ext\AbstractGenerator;
+use Zend\Ext\Models\AbstractGenerator;
 
 use function array_diff;
 use function array_map;
