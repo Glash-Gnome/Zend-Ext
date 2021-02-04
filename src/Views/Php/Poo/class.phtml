@@ -1,10 +1,11 @@
 <?php echo '<?php' ?>
 
-namespace <?php echo $this->namespace ?>;
+namespace <?php echo $this->phpHelper($this->namespace) ?>;
 
 class <?php echo $this->name ?> <?php echo isset($this->extends)?'extends '.$this->extends:''; ?>
 {
 <?php foreach($this->methods as $method): ?>
 <?php $method->generate(); ?>
 <?php endforeach; ?>
+<?php /*story telling, mon histoire celle de mes client; mon experience pro*/ ?>
 }
