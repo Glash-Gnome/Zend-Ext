@@ -14,4 +14,6 @@ use Error;
 /**
  * Invalid Argument Exception
  */
-class InvalidArgumentException extends Error{}
+class InvalidArgumentException extends Error {
+
+}

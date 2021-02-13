@@ -9,14 +9,28 @@
 
 namespace Zend\Ext\Models;
 
-use Traversable;
+use Zend\Stdlib\Exception\InvalidArgumentException;
 
+/*
+use Traversable;
 use function get_class;
 use function gettype;
 use function is_array;
 use function is_object;
 use function method_exists;
 use function sprintf;
+*/
+
+/*
+ * TODO remove :
+            [indentation:protected] =>
+            [length_line:protected] => 80
+            [wordwrap:protected] => 1
+            [author:protected] => Glash
+            [email:protected] => 5312910@php.net
+            [adapter:protected] =>
+            [nameFilter:protected] =>
+ */
 
 abstract class AbstractGenerator implements GeneratorInterface
 {
@@ -41,21 +55,32 @@ abstract class AbstractGenerator implements GeneratorInterface
     protected $description = '';
     protected $short_description = '';
 
+    // TODO remove this function
     /**
      * @var Zend\Ext\Adapter $adapter
      */
     protected $adapter;
 
     /**
-     * AbstractGenerator
+     * The root of the generator, usually PackageGenerator
+     * @var Zend\Ext\Models\PackageGenerator $ownPackage
      */
-    protected $parentGenerator;
+    protected $ownPackage = NULL;
 
     /**
-     * integer
+     * @var Zend\Ext\Models\AbstractGenerator $parentGenerator
+     */
+    protected $parentGenerator = NULL;
+
+    /**
+     * @var int $visibility
      */
     protected $visibility=self::VISIBILITY_PUBLIC;
 
+    /**
+     * @var string $name
+     */
+    protected $name;
 
     /*
      *
@@ -63,13 +88,33 @@ abstract class AbstractGenerator implements GeneratorInterface
     protected $nameFilter;
 
     /**
-     * @param  array $options
+     * @param  string|array $options
      */
-    public function __construct($options = [])
+    public function __construct($options = NULL)
     {
-        if ($options) {
+        if (is_array($options)) {
             $this->setOptions($options);
+        } else if (is_string($options)) {
+            $this->setName($options);
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @return AbstractGenerator
+     */
+    public function setName(?string $name): AbstractGenerator
+    {
+        $this->name = $name;
+        return $this;
     }
 
     /**
@@ -116,7 +161,7 @@ abstract class AbstractGenerator implements GeneratorInterface
     public function setOptions($options)
     {
         if (! is_array($options) && ! $options instanceof Traversable) {
-            throw new Exception\InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 '%s expects an array or Traversable object; received "%s"',
                 __METHOD__,
                 is_object($options) ? get_class($options) : gettype($options)
@@ -185,6 +230,37 @@ abstract class AbstractGenerator implements GeneratorInterface
     }
 
     /**
+     * @return Zend\Ext\Models\PackageGenerator
+     */
+    public function getOwnPackage():? PackageGenerator
+    {
+        if (isset($this->ownPackage)) {
+            return $this->ownPackage;
+        }
+        if ($this instanceof PackageGenerator) {
+            return $this;
+        }
+        $parent = $this->getParentGenerator();
+        if ($parent) {
+            $this->ownPackage = $parent->getOwnPackage();
+        } else {
+            throw new Exception("Your Generator is not a part of a PackageGenerator");
+        }
+        return $this->ownPackage;
+    }
+
+    /**
+     * @param Zend\Ext\Models\PackageGenerator $ownPackage
+     * @return AbstractGenerator
+     */
+    public function setOwnPackage(Zend\Ext\Models\PackageGenerator $ownPackage): AbstractGenerator
+    {
+        $this->ownPackage = $ownPackage;
+        return $this;
+    }
+
+    // TODO remove this function
+    /**
      * @return Zend\Ext\Adapter
      */
     public function getAdapter()
@@ -192,6 +268,7 @@ abstract class AbstractGenerator implements GeneratorInterface
         return $this->adapter;
     }
 
+    // TODO remove this function
     /**
      * @param Zend\Ext\Adapter $adapter
      * @return AbstractGenerator
@@ -202,6 +279,7 @@ abstract class AbstractGenerator implements GeneratorInterface
         return $this;
     }
 
+    // TODO remove this function
     public function generate($scope)
     {
         //$this->getAdapter()->setScope($scope);

@@ -40,43 +40,72 @@ class TypeGenerator extends AbstractGenerator
     const PRIMITIVE_UINT32 = 0x19;
     const PRIMITIVE_UINT64 = 0x20;
 
-    /* TODO
-'void',
-'int',
-'float',
-'string',
-'bool',
-'array',      <= int var[], GArray, etc...
-'callable',   <= void (*call)(void);GCallback, ...
-'iterable',   <= int var[]...
-'object'      <= (void*), GObject, ...
-    */
 
-    // correspondance entre C->PHP
-    private static $internalPhpTypes = [
-        self::PRIMITIVE_VOID   =>'void',
-        self::PRIMITIVE_BOOL   =>'bool',
-        self::PRIMITIVE_CHAR   =>'string',
-        self::PRIMITIVE_SHORT  =>'int',
-        self::PRIMITIVE_INT    =>'int',
-        self::PRIMITIVE_FLOAT  =>'float',
-        self::PRIMITIVE_LONG   =>'int',
-        self::PRIMITIVE_DOUBLE =>'float',
-        self::PRIMITIVE_UCHAR  =>'string',
-        self::PRIMITIVE_USHORT =>'int',
-        self::PRIMITIVE_ULONG  =>'int',
-        self::PRIMITIVE_UINT   =>'int',
+    // correspondance entre C->Model
 
-        self::PRIMITIVE_STRING =>'string',
+    private static $internalCTypes = [
+        'void'                => self::PRIMITIVE_VOID,
 
-        self::PRIMITIVE_INT8   =>'int',
-        self::PRIMITIVE_INT16  =>'int',
-        self::PRIMITIVE_INT32  =>'int',
-        self::PRIMITIVE_INT64  =>'int',
-        self::PRIMITIVE_UINT8  =>'int',
-        self::PRIMITIVE_UINT16 =>'int',
-        self::PRIMITIVE_UINT32 =>'int',
-        self::PRIMITIVE_UINT64 =>'int',
+        //'gpointer'            => self::PRIMITIVE_OBJECT?,
+
+        /*
+        typedef char   gchar;
+        typedef short  gshort;
+        typedef long   glong;
+        typedef int    gint;
+        typedef gint   gboolean;
+
+        typedef unsigned char   guchar;
+        typedef unsigned short  gushort;
+        typedef unsigned long   gulong;
+        typedef unsigned int    guint;
+
+        typedef float   gfloat;
+        typedef double  gdouble;
+        */
+        'gboolean'            => self::PRIMITIVE_BOOL,
+        'gchar'               => self::PRIMITIVE_CHAR,
+        'gshort'              => self::PRIMITIVE_SHORT,
+        'gint'                => self::PRIMITIVE_INT,
+        'gfloat'              => self::PRIMITIVE_FLOAT,
+        'glong'               => self::PRIMITIVE_LONG,
+        'gdouble'             => self::PRIMITIVE_DOUBLE,
+
+        'guchar'              => self::PRIMITIVE_UCHAR,
+        'gushort'             => self::PRIMITIVE_USHORT,
+        'gulong'              => self::PRIMITIVE_ULONG,
+        'guint'               => self::PRIMITIVE_UINT,
+
+        /*
+         * GString
+         * char*
+         * char[]
+         */
+        'GString' => self::PRIMITIVE_STRING,
+        'char*' => self::PRIMITIVE_STRING,
+
+        /*
+        typedef signed char gint8;
+        typedef unsigned char guint8;
+        typedef signed short gint16;
+        typedef unsigned short guint16;
+
+        typedef signed int gint32;
+        typedef unsigned int guint32;
+
+        typedef signed long gint64;
+        typedef unsigned long guint64;
+        */
+
+        'gint8'               => self::PRIMITIVE_INT8,
+        'gint16'              => self::PRIMITIVE_INT16,
+        'gint32'              => self::PRIMITIVE_INT32,
+        'gint64'              => self::PRIMITIVE_INT64,
+
+        'guint8'              => self::PRIMITIVE_UINT8,
+        'guint16'             => self::PRIMITIVE_UINT16,
+        'guint32'             => self::PRIMITIVE_UINT32,
+        'guint64'             => self::PRIMITIVE_UINT64
     ];
 
     /**
@@ -85,6 +114,7 @@ class TypeGenerator extends AbstractGenerator
     protected $name;
     protected $isArray=False;
     protected $isPrimitive=False;
+    protected $primitiveType=NULL;
     protected $expressionArray;
 
     /**
@@ -92,13 +122,19 @@ class TypeGenerator extends AbstractGenerator
      */
     public function __construct($name)
     {
-        $this->name = $name;
         //parent::__construct($name);
+        $this->setName($name);
     }
 
     public function setName($name)
     {
         $this->name = $name;
+        $types = array_keys(self::$internalCTypes);
+        if (in_array($name, $types)) {
+            $this->isPrimitive = TRUE;
+            $this->primitiveType = self::$internalCTypes[$name];
+        }
+
         return $this;
     }
 
@@ -117,6 +153,23 @@ class TypeGenerator extends AbstractGenerator
     {
         return $this->isArray;
     }
+    /**
+     * @return int
+     */
+    public function getPrimitiveType()
+    {
+        return $this->primitiveType;
+    }
+
+    /**
+     * @param null $primitiveType
+     * @return TypeGenerator
+     */
+    public function setPrimitiveType($primitiveType)
+    {
+        $this->primitiveType = $primitiveType;
+        return $this;
+    }
 
     public function setExpressionArray($expressionArray)
     {
@@ -127,6 +180,11 @@ class TypeGenerator extends AbstractGenerator
     public function getExpressionArray()
     {
         return $this->expressionArray;
+    }
+
+    public function isPrimitive()
+    {
+        return $this->isPrimitive;
     }
 
 

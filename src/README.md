@@ -1,10 +1,15 @@
 # Zend Extension
 C & Php code generator from ModelGenerator
 
-TODO:
+TODO: GList( type of GLib Gio)
 
 FIXME Php\ClassGenerator ~ Php\ClassAdapter
 rename Models\ClassGenerator by Models\ClassModel
+
+FIXME: Filter\CommentHelper
+ + Comment strip tag.
+ + Replace reference in the document.
+ -> (attendre de faire une dc php avant)
 
 ```
 Models

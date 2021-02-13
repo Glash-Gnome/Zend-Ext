@@ -1,11 +1,15 @@
 <?php echo '<?php' ?>
 
-namespace <?php echo $this->phpHelper($this->namespace) ?>;
+namespace <?php echo $this->namespaceHelper($this->name) ?>;
 
-class <?php echo $this->name ?> <?php echo isset($this->extends)?'extends '.$this->extends:''; ?>
+/**
+<?php echo $this->commentHelper($this->description) ?>
+ */
+class <?php echo $this->nameclassHelper($this->name) ?> <?php echo isset($this->extends)?'extends '.$this->extends:''; ?>
 {
-<?php foreach($this->methods as $method): ?>
-<?php $method->generate(); ?>
+<?php foreach($this->methods as $key=>$method): ?>
+<?php //echo $key.PHP_EOL ?>
+<?php echo $this->methodHelper($method); ?>
 <?php endforeach; ?>
-<?php /*story telling, mon histoire celle de mes client; mon experience pro*/ ?>
+
 }

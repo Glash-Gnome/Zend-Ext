@@ -12,8 +12,8 @@ namespace Zend\Ext\Exceptions;
 use Error;
 
 /**
- * File do not exists Exception
+ * Declaration structure unexpected Exception
  */
-class NoSuchFileException extends Error {
-
+class BadDeclarationException extends Error
+{
 }

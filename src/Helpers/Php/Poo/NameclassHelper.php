@@ -5,7 +5,7 @@ namespace Zend\Ext\Helpers\Php\Poo;
 use Zend\View\Helper\AbstractHelper;
 
 
-class NamespaceHelper extends AbstractHelper
+class NameclassHelper extends AbstractHelper
 {
     static public $filter = NULL;
 
@@ -13,7 +13,8 @@ class NamespaceHelper extends AbstractHelper
     {
         $tmp = self::$filter->filter($name);
         $pos = strpos($tmp, '_');
-        $name = substr($tmp, 0, $pos);
+        $tmp = substr($tmp, $pos+1);
+        $name = str_replace('_', '', $tmp);
         return $name;
     }
 }

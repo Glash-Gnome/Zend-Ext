@@ -12,6 +12,8 @@ namespace Zend\Ext\Exceptions;
 use Error;
 
 /**
- * Invalid File Exception
+ * Unexpected XML structure Exception
  */
-class LogicFileException extends Error{}
+class LogicFileException extends Error {
+
+}
